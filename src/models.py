@@ -247,14 +247,15 @@ class LiftSplatShoot(nn.Module):
         Nprime = B*N*D*H*W
 
         # flatten x
-        # x (B*N*D*H*W, C) ego坐标系的点
-        # geom_feats (B x N x D x H x W x 3) 图像特征点云
+        # x (B*N*D*H*W, C) 图像特征点云
+        # geom_feats (B x N x D x H x W x 3) ego坐标系的点
         x = x.reshape(Nprime, C)
 
         # flatten indices
         # 世界坐标转化为体素坐标
         # 转化的公式：图像坐标 = 世界坐标系下的（位置 - 原点位置）/ 像素间隔
         geom_feats = ((geom_feats - (self.bx - self.dx/2.)) / self.dx).long()
+        # geom_feats (B*N*D*H*W, 3) 
         geom_feats = geom_feats.view(Nprime, 3)
         '''
         torch.full([2,3],2.0)
@@ -295,10 +296,14 @@ class LiftSplatShoot(nn.Module):
         # griddify (B x C x Z x X x Y)
         # final:bsx64x1x200x200
         final = torch.zeros((B, C, self.nx[2], self.nx[0], self.nx[1]), device=x.device)
+        # 将对应点的点云特征代入
+        # 需要注意的是，geom_feats[:, 3]索引不会超过bs-1，geom_feats[:, 2]索引不会超过0，
+        # geom_feats[:, 0]、geom_feats[:, 1]同理
         final[geom_feats[:, 3], :, geom_feats[:, 2], geom_feats[:, 0], geom_feats[:, 1]] = x
 
         # collapse Z 消除z dim
         # final:bsx64x200x200
+        # torch.squeeze(final, dim=2)
         final = torch.cat(final.unbind(dim=2), 1)
 
         return final

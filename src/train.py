@@ -31,6 +31,10 @@ def train(version,
             pos_weight=2.13,
             logdir='./runs',
 
+            # xrange[-50,50] grid 0.5
+            # yrange[-50,50] grid 0.5
+            # zrange[-10,10] grid 20 -> voxel 1 格子
+            # depthrange[4,45] grid 1
             xbound=[-50.0, 50.0, 0.5],
             ybound=[-50.0, 50.0, 0.5],
             zbound=[-10.0, 10.0, 20.0],
@@ -67,8 +71,10 @@ def train(version,
     model = compile_model(grid_conf, data_aug_conf, outC=1)
     model.to(device)
 
+    # Suggest to change to Adamw
     opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
+    # BCELoss with Logits 
     loss_fn = SimpleLoss(pos_weight).cuda(gpuid)
 
     writer = SummaryWriter(logdir=logdir)
@@ -88,6 +94,7 @@ def train(version,
                     post_rots.to(device),
                     post_trans.to(device),
                     )
+            # pred bsxcx200(BEVh)x200(BEVw)
             binimgs = binimgs.to(device)
             loss = loss_fn(preds, binimgs)
             loss.backward()
