@@ -148,9 +148,9 @@ class LiftSplatShoot(nn.Module):
         '''
 
         dx, bx, nx = gen_dx_bx(self.grid_conf['xbound'],
-                                              self.grid_conf['ybound'],
-                                              self.grid_conf['zbound'],
-                                              )
+                                            self.grid_conf['ybound'],
+                                            self.grid_conf['zbound'],
+                                            )
         self.dx = nn.Parameter(dx, requires_grad=False)
         self.bx = nn.Parameter(bx, requires_grad=False)
         self.nx = nn.Parameter(nx, requires_grad=False)
@@ -187,8 +187,9 @@ class LiftSplatShoot(nn.Module):
         # D x H x W x 3
         # 41*8*22*3
         frustum = torch.stack((xs, ys, ds), -1)
-        # frustum[i,j,k,0]就是(i,j)位置，深度为k的像素的宽度方向上的栅格坐标xs
-        return nn.Parameter(frustum, requires_grad=False) # Learnable Parameter
+        # Assume 锥点取[i,j,k] 即frustum[i,j,k] 返回的坐标为[x,y,d](对应图像坐标系)
+        # k对应的是第k个xs点，j对应的是第j个ys点，i对应的是第i个ds点
+        return nn.Parameter(frustum, requires_grad=False) # requires_grad=False 固定的玩意
 
     def get_geometry(self, rots, trans, intrins, post_rots, post_trans):
         # 锥点由图像坐标系向自车坐标系进行坐标转化
@@ -204,7 +205,7 @@ class LiftSplatShoot(nn.Module):
         # self.frustum D x H x W x 3
         # post_trans：由图像增强引起的平移矩阵，post_trans=(bs, N, 3)
         # 这边代码利用了张量的广播机制，points.size->B x N x D x H x W x 3
-        # 抵消数据增强及预处理对像素的变化   R-1*(C-T)  R-1*((xs,ys,ds)-(x0,y0,z0))
+        # 抵消数据增强及预处理对像素的变化   R^-1*(C-T)  R^-1*((xs,ys,ds)-(x0,y0,z0))
         points = self.frustum - post_trans.view(B, N, 1, 1, 1, 3)
         points = torch.inverse(post_rots).view(B, N, 1, 1, 1, 3, 3).matmul(points.unsqueeze(-1))
 
@@ -260,11 +261,11 @@ class LiftSplatShoot(nn.Module):
         '''
         torch.full([2,3],2.0)
         tensor([[2., 2., 2.,
-                 2., 2., 2.]])
+                2., 2., 2.]])
         '''
         # batch_ix (B*N*D*H*W, 1) 每个点对应于哪个batch
         batch_ix = torch.cat([torch.full([Nprime//B, 1], ix,
-                             device=x.device, dtype=torch.long) for ix in range(B)])
+                                device=x.device, dtype=torch.long) for ix in range(B)])
         # geom_feats (B*N*D*H*W, 4)
         geom_feats = torch.cat((geom_feats, batch_ix), 1)
 
