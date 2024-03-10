@@ -213,6 +213,7 @@ class LiftSplatShoot(nn.Module):
 
         # cam_to_ego
         # Z[u,v,1] = KP
+        # In BEVfusion author consider matrix rots, trans as cam2lidar frame rots, cam2lidar frame trans
         points = torch.cat((points[:, :, :, :, :, :2] * points[:, :, :, :, :, 2:3],
                             points[:, :, :, :, :, 2:3]
                             ), 5)

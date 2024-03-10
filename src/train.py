@@ -72,6 +72,7 @@ def train(version,
                              'CAM_BACK_LEFT', 'CAM_BACK', 'CAM_BACK_RIGHT'],
                     'Ncams': ncams,
                 }
+    seedAnything(42)
     trainloader, valloader = compile_data(version, dataroot, data_aug_conf=data_aug_conf,
                                           grid_conf=grid_conf, bsz=bsz, nworkers=nworkers,
                                           parser_name='segmentationdata')
@@ -93,7 +94,6 @@ def train(version,
     model.train()
     counter = 0
     for epoch in range(nepochs):
-        seedAnything(42)
         for batchi, (imgs, rots, trans, intrins, post_rots, post_trans, binimgs) in enumerate(trainloader):
             t0 = time()
             opt.zero_grad()
