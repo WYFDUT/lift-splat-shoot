@@ -14,6 +14,16 @@ from .models import compile_model
 from .data import compile_data
 from .tools import SimpleLoss, get_batch_iou, get_val_info
 
+import random
+os.environ['CUDA_VISIBLE_DEVICES'] = "3"
+
+def seedAnything(seed):
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+
 
 def train(version,
             dataroot='/data/nuscenes',
@@ -83,7 +93,7 @@ def train(version,
     model.train()
     counter = 0
     for epoch in range(nepochs):
-        np.random.seed()
+        seedAnything(42)
         for batchi, (imgs, rots, trans, intrins, post_rots, post_trans, binimgs) in enumerate(trainloader):
             t0 = time()
             opt.zero_grad()
