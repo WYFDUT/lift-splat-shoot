@@ -188,8 +188,14 @@ class LiftSplatShoot(nn.Module):
         # D x H x W x 3
         # 41*8*22*3
         frustum = torch.stack((xs, ys, ds), -1)
-        # Assume 锥点取[i,j,k] 即frustum[i,j,k] 返回的坐标为[x,y,d](对应图像坐标系)
+        # Assume 锥点取[i,j,k] 即frustum[i,j,k] 返回的坐标为[u,v,d](对应图像坐标系)
         # k对应的是第k个xs点，j对应的是第j个ys点，i对应的是第i个ds点
+        '''
+        官方代码中生成视锥点云的实现方式是：
+        如下图4所示，定义距离图像特征平面4m到44m、间隔1m的多个平面，
+        这样每个图像特征点有D=41个可能的离散深度值。每个点相对相机的描述的位置是[h, w, d]，
+        利用相机内、外参，可以把这个位置转换成用车辆坐标系下的空间位置来表示，其维度也是HxWxDx3，即HxWxD个[x, y, z]。
+        '''
         return nn.Parameter(frustum, requires_grad=False) # requires_grad=False 固定的玩意
 
     def get_geometry(self, rots, trans, intrins, post_rots, post_trans):

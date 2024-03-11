@@ -1,0 +1,1 @@
+python main.py train mini --dataroot=/root/wyf/dataset/nuScenes --logdir=./runs --gpuid=0

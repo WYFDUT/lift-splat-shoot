@@ -37,6 +37,10 @@ Download a pre-trained BEV vehicle segmentation model from here: [https://drive.
 |:-------------:|:-------------:| 
 | 32.07      | 33.03 |
 
+| Val Vehicle IOU (in mini dataset)        | Val Loss (in mini dataset)        |
+|:-------------:|:-------------:| 
+| 35.72      | 0.09648 |
+
 ### Evaluate a model
 Evaluate the IOU of a model on the nuScenes validation set. To evaluate on the "mini" split, pass `mini`. To evaluate on the "trainval" split, pass `trainval`.
 

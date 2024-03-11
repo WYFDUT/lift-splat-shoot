@@ -1,0 +1,1 @@
+python main.py eval_model_iou mini --modelf=/root/wyf/BEV/lift-splat-shoot/weights/model525000.pt --dataroot=/root/wyf/dataset/nuScenes --gpuid=0
