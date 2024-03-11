@@ -222,6 +222,7 @@ class LiftSplatShoot(nn.Module):
         points = combine.view(B, N, 1, 1, 1, 3, 3).matmul(points).squeeze(-1)
         points += trans.view(B, N, 1, 1, 1, 3)
         '''
+        # EXP evident that below code is wrong
         points = torch.inverse(intrins).view(B, N, 1, 1, 1, 3, 3).matmul(points)
         points -= trans.view(B, N, 1, 1, 1, 3, 1)
         points = torch.inverse(rots).view(B, N, 1, 1, 1, 3, 3).matmul(points).squeeze(-1)
